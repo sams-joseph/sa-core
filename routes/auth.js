@@ -26,24 +26,22 @@ api.post('/', (req, res) => {
 
 api.post('/confirmation', (req, res) => {
   const token = req.body.token;
-  User.update(
-    { confirmed: true, confirmationToken: '' },
-    { where: { confirmationToken: token }, returning: true, plain: true }
-  )
-    .then(result => {
-      if (result[1].dataValues) {
-        User.findOne({ where: { email: result[1].dataValues.email } })
-          .then(user => {
-            if (user) {
-              res.status(200).json({ message: 'User confirmation successful.', user: user.toAuthJSON() });
-            }
-          })
+  User.findOne({ where: { confirmationToken: token } })
+    .then(user => {
+      if (user) {
+        user
+          .update({ confirmed: true, confirmationToken: '' })
+          .then(updatedUser =>
+            res.status(200).json({ message: 'User confirmation successful.', user: updatedUser.toAuthJSON() })
+          )
           .catch(err => res.status(400).json({ errors: err }));
+      } else {
+        res.status(400).json({ errors: { message: 'User has already been confirmed or does not exist.' } });
       }
+
+      return null;
     })
-    .catch(err => {
-      res.status(400).json({ errors: { message: 'Email has already been confirmed or does not exist.' } });
-    });
+    .catch(err => res.status(400).json({ errors: err }));
 });
 
 module.exports = api;
