@@ -1,0 +1,38 @@
+version: '2'
+services:
+  postgres:
+    build:
+      context: .
+      dockerfile: docker/postgres.dockerfile
+    image: postgres
+    restart: always
+    volumes_from:
+      - data
+    container_name: sepsis-postgres
+  data:
+    image: tianon/true
+    volumes:
+      - /var/lib/postgresql/data
+    container_name: sepsis-data
+  core:
+    build:
+      context: .
+      args:
+        - NODE_ENV=development
+      dockerfile: Dockerfile
+    entrypoint: bash docker/main-launch.sh
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/usr/src
+    links:
+      - postgres
+    environment:
+      - NODE_ENV=development
+      - POSTGRES_URL=postgres://postgres:postgres@postgres:5432/sepsis
+      - PGHOST=postgres://postgres:postgres@postgres
+      - PGUSER=postgres
+      - PGDATABASE=sepsis
+      - PGPASSWORD=password
+      - PGPORT=5432
+    container_name: sepsis-core
