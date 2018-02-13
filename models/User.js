@@ -79,7 +79,11 @@ User.prototype.setConfirmationToken = function setConfirmationToken() {
 };
 
 User.prototype.generateConfirmationUrl = function generateConfirmationUrl() {
-  return `${process.env.HOST}/api/auth/confirmation/${this.confirmationToken}`;
+  return `${process.env.HOST}/confirmation/${this.confirmationToken}`;
+};
+
+User.prototype.generateResetPasswordLink = function generateResetPasswordLink() {
+  return `${process.env.HOST}/reset_password/${this.generateResetPasswordToken()}`;
 };
 
 User.prototype.generateJWT = function generateJWT() {
@@ -90,6 +94,16 @@ User.prototype.generateJWT = function generateJWT() {
       email: this.email,
     },
     process.env.JWT_SECRET_KEY
+  );
+};
+
+User.prototype.generateResetPasswordToken = function generateResetPasswordToken() {
+  return jwt.sign(
+    {
+      id: this.id,
+    },
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: '1h' }
   );
 };
 
