@@ -1,6 +1,8 @@
 const Sequelize = require('sequelize');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cryptoRandomString = require('crypto-random-string');
+const moment = require('moment');
 
 const db = require('../store/db');
 
@@ -31,8 +33,12 @@ const User = db.define('users', {
     type: Sequelize.STRING,
     allowNul: true,
   },
-  rememberToken: {
+  resetPasswordToken: {
     type: Sequelize.STRING,
+    allowNull: true,
+  },
+  resetPasswordExpires: {
+    type: Sequelize.DATE,
     allowNull: true,
   },
   isDeleted: {
@@ -83,28 +89,37 @@ User.prototype.generateConfirmationUrl = function generateConfirmationUrl() {
 };
 
 User.prototype.generateResetPasswordLink = function generateResetPasswordLink() {
-  return `${process.env.HOST}/reset_password/${this.generateResetPasswordToken()}`;
+  const resetPasswordToken = this.generateResetPasswordToken();
+  this.resetPasswordToken = resetPasswordToken;
+  this.resetPasswordExpires = moment().add(1, 'hour');
+  this.save();
+  return `${process.env.HOST}/reset-password/${this.generateResetPasswordToken()}`;
+};
+
+User.prototype.setUserInfo = function setUserInfo() {
+  return {
+    id: this.id,
+    firstName: this.firstName,
+    lastName: this.lastName,
+    email: this.email,
+  };
 };
 
 User.prototype.generateJWT = function generateJWT() {
   return jwt.sign(
     {
+      id: this.id,
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
     },
-    process.env.JWT_SECRET_KEY
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: '1h' }
   );
 };
 
 User.prototype.generateResetPasswordToken = function generateResetPasswordToken() {
-  return jwt.sign(
-    {
-      id: this.id,
-    },
-    process.env.JWT_SECRET_KEY,
-    { expiresIn: '1h' }
-  );
+  return cryptoRandomString(40);
 };
 
 User.prototype.toAuthJSON = function toAuthJSON() {

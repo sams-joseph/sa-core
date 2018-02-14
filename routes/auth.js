@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const moment = require('moment');
 
 const User = require('../models/User');
 const formatErrors = require('../utils/errors');
@@ -53,18 +54,18 @@ api.post('/confirmation', (req, res) => {
     .catch(err => res.status(400).json({ errors: err }));
 });
 
-api.post('/reset_password_request', (req, res) => {
+api.post('/forgot-password', (req, res) => {
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
       sendResetPasswordEmail(user);
-      res.json({});
+      res.json({ message: 'An email has been sent with a link to reset your password.' });
     } else {
       res.status(400).json({ errors: { message: 'There is no user with that email.' } });
     }
   });
 });
 
-api.post('/validate_token', (req, res) => {
+api.post('/validate-token', (req, res) => {
   jwt.verify(req.body.token, process.env.JWT_SECRET_KEY, err => {
     if (err) {
       res.status(401).json({});
@@ -74,21 +75,16 @@ api.post('/validate_token', (req, res) => {
   });
 });
 
-api.post('/reset_password', (req, res) => {
+api.post('/reset-password', (req, res) => {
   const { password, token } = req.body;
-  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-    if (err) {
-      res.status(401).json({ errors: { message: 'User either does not exist or link has expired.' } });
+  User.findOne({ resetPasswordToken: token }).then(user => {
+    if (user && moment(user.resetPasswordExpires).diff(moment()) > 0) {
+      user.setPassword(password);
+      user.resetPasswordToken = null;
+      user.resetPasswordExpires = null;
+      user.save().then(() => res.json({ message: 'Your password has been reset successfully.' }));
     } else {
-      console.log(decoded);
-      User.findOne({ id: decoded.id }).then(user => {
-        if (user) {
-          user.setPassword(password);
-          user.save().then(() => res.json({}));
-        } else {
-          res.status(404).json({ errors: { message: 'User either does not exist or link has expired.' } });
-        }
-      });
+      res.status(404).json({ errors: { message: 'User either does not exist or link has expired.' } });
     }
   });
 });
