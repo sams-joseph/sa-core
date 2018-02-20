@@ -64,7 +64,7 @@ User.loginUser = function loginUser(data) {
       .then(user => {
         if (user && user.isValidPassword(data.password, user.password)) {
           ok(user);
-        } else reject({ errors: [{ message: 'Invalid Credentials.' }] });
+        } else reject({ errors: { global: 'Email or Password is incorrect' } });
       })
       .catch(err => reject(err));
   });
@@ -112,6 +112,7 @@ User.prototype.generateJWT = function generateJWT() {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
+      confirmed: this.confirmed,
     },
     process.env.JWT_SECRET_KEY,
     { expiresIn: '1h' }

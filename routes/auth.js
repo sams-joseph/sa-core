@@ -3,28 +3,27 @@ const jwt = require('jsonwebtoken');
 const moment = require('moment');
 
 const User = require('../models/User');
-const formatErrors = require('../utils/errors');
 const sendResetPasswordEmail = require('../mail/mailer').sendResetPasswordEmail;
 
 const api = express.Router();
 
 api.post('/', (req, res) => {
-  const { email, password } = req.body.credentials;
-  User.loginUser({
-    email,
-    password,
-  })
-    .then(user =>
-      res.status(200).json({
-        message: 'Successfully logged in.',
-        user: user.toAuthJSON(),
-      })
-    )
-    .catch(err => {
-      res.status(400).json({
-        errors: formatErrors(err.errors),
-      });
-    });
+  const { credentials } = req.body;
+
+  User.findOne({ where: { email: credentials.email } })
+    .then(user => {
+      if (user && user.isValidPassword(credentials.password, user.password)) {
+        res.status(200).json({
+          message: 'Successfully logged in.',
+          user: user.toAuthJSON(),
+        });
+      } else {
+        res.status(400).json({
+          errors: { global: 'Email or Password are Incorrect' },
+        });
+      }
+    })
+    .catch(err => err);
 });
 
 api.post('/confirmation', (req, res) => {
@@ -85,6 +84,20 @@ api.post('/reset-password', (req, res) => {
       user.save().then(() => res.json({ message: 'Your password has been reset successfully.' }));
     } else {
       res.status(404).json({ errors: { message: 'User either does not exist or link has expired.' } });
+    }
+  });
+});
+
+api.post('/confirmation', (req, res) => {
+  const token = req.body.token;
+
+  User.findOne({ confirmationToken: token }).then(user => {
+    if (user) {
+      user.confirmationToken = '';
+      user.confirmed = true;
+      user.save().then(userRecord => res.json({ user: userRecord.toAuthJSON() }));
+    } else {
+      res.status(400).json({});
     }
   });
 });
