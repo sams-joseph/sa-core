@@ -9,6 +9,8 @@ const cors = require('cors');
 const config = require('./config');
 const auth = require('./routes/auth');
 const users = require('./routes/users');
+const products = require('./routes/products');
+const sizes = require('./routes/sizes');
 
 dotenv.config();
 const app = express();
@@ -17,6 +19,8 @@ app.use(bodyParser.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use('/api/auth', auth);
 app.use('/api/users', users);
+app.use('/api/products', products);
+app.use('/api/sizes', sizes);
 
 app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
