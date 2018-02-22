@@ -11,6 +11,7 @@ const auth = require('./routes/auth');
 const users = require('./routes/users');
 const products = require('./routes/products');
 const sizes = require('./routes/sizes');
+const designs = require('./routes/designs');
 
 dotenv.config();
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api/auth', auth);
 app.use('/api/users', users);
 app.use('/api/products', products);
 app.use('/api/sizes', sizes);
+app.use('/api/designs', designs);
 
 app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));

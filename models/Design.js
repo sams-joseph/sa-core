@@ -2,21 +2,21 @@ const Sequelize = require('sequelize');
 
 const db = require('../store/db');
 
-const Size = db.define('sizes', {
+const Design = db.define('designs', {
   productID: {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
-  displayName: {
+  name: {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  height: {
-    type: Sequelize.INTEGER,
+  description: {
+    type: Sequelize.STRING,
     allowNull: false,
   },
-  width: {
-    type: Sequelize.INTEGER,
+  imageUrl: {
+    type: Sequelize.STRING,
     allowNull: false,
   },
   isDeleted: {
@@ -36,4 +36,4 @@ const Size = db.define('sizes', {
   },
 });
 
-module.exports = Size;
+module.exports = Design;

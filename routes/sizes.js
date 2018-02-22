@@ -21,8 +21,8 @@ api.get('/', (req, res) => {
 });
 
 api.post('/', (req, res) => {
-  const { productID, height, width } = req.body;
-  const size = new Size({ productID, height, width });
+  const { displayName, productID, height, width } = req.body;
+  const size = new Size({ displayName, productID, height, width });
   size
     .save()
     .then(sizeRecord => {
