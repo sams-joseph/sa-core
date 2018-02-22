@@ -5,11 +5,11 @@ const Size = require('../models/Size');
 const api = express.Router();
 
 api.get('/', (req, res) => {
-  const { productID } = req.body;
+  const { id } = req.query;
   Size.findAll({
     where: {
       isDeleted: false,
-      productID,
+      productID: id,
     },
   })
     .then(sizes => {
