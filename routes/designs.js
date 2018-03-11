@@ -1,10 +1,11 @@
 const express = require('express');
 
 const Design = require('../models/Design');
+const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
-api.get('/', (req, res) => {
+api.get('/', authenticate, (req, res) => {
   const { id } = req.query;
   Design.findAll({
     where: {
@@ -21,7 +22,7 @@ api.get('/', (req, res) => {
     });
 });
 
-api.post('/', (req, res) => {
+api.post('/', authenticate, (req, res) => {
   const { productID, name, description, imageUrl } = req.body;
   const design = new Design({ productID, name, description, imageUrl });
   design

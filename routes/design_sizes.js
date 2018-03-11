@@ -1,10 +1,11 @@
 const express = require('express');
 
 const DesignSize = require('../models/DesignSize');
+const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
-api.get('/', (req, res) => {
+api.get('/', authenticate, (req, res) => {
   const { designID, sizeID } = req.query;
   DesignSize.findOne({
     where: {
@@ -21,7 +22,7 @@ api.get('/', (req, res) => {
     });
 });
 
-api.post('/', (req, res) => {
+api.post('/', authenticate, (req, res) => {
   const { designID, sizeID, imageUrl } = req.body;
   const designSize = new DesignSize({ designID, sizeID, imageUrl });
   designSize

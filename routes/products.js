@@ -1,10 +1,11 @@
 const express = require('express');
 
 const Product = require('../models/Product');
+const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
-api.get('/', (req, res) => {
+api.get('/', authenticate, (req, res) => {
   Product.findAll({
     where: {
       isDeleted: false,
@@ -19,7 +20,7 @@ api.get('/', (req, res) => {
     });
 });
 
-api.post('/', (req, res) => {
+api.post('/', authenticate, (req, res) => {
   const { name, description, imageUrl } = req.body;
   const product = new Product({ name, description, imageUrl });
   product

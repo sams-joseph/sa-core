@@ -1,10 +1,11 @@
 const express = require('express');
 
 const Size = require('../models/Size');
+const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
-api.get('/', (req, res) => {
+api.get('/', authenticate, (req, res) => {
   const { id } = req.query;
   Size.findAll({
     where: {
@@ -20,7 +21,7 @@ api.get('/', (req, res) => {
     });
 });
 
-api.post('/', (req, res) => {
+api.post('/', authenticate, (req, res) => {
   const { displayName, productID, height, width } = req.body;
   const size = new Size({ displayName, productID, height, width });
   size
