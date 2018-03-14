@@ -22,6 +22,23 @@ api.get('/', authenticate, (req, res) => {
     });
 });
 
+api.get('/design', authenticate, (req, res) => {
+  const { id } = req.query;
+  Design.findOne({
+    where: {
+      isDeleted: false,
+      id,
+    },
+    attributes: ['id', 'name', 'description', 'imageUrl', 'createdAt', 'updatedAt'],
+  })
+    .then(design => {
+      res.status(200).json({ design });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
 api.post('/', authenticate, (req, res) => {
   const { productID, name, description, imageUrl } = req.body;
   const design = new Design({ productID, name, description, imageUrl });

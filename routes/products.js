@@ -20,6 +20,23 @@ api.get('/', authenticate, (req, res) => {
     });
 });
 
+api.get('/product', authenticate, (req, res) => {
+  const { id } = req.query;
+  Product.findOne({
+    where: {
+      isDeleted: false,
+      id,
+    },
+    attributes: ['id', 'name', 'description', 'imageUrl', 'createdAt', 'updatedAt'],
+  })
+    .then(product => {
+      res.status(200).json({ product });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
 api.post('/', authenticate, (req, res) => {
   const { name, description, imageUrl } = req.body;
   const product = new Product({ name, description, imageUrl });
