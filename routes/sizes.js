@@ -21,6 +21,22 @@ api.get('/', authenticate, (req, res) => {
     });
 });
 
+api.get('/size', authenticate, (req, res) => {
+  const { id } = req.query;
+  Size.findOne({
+    where: {
+      isDeleted: false,
+      id,
+    },
+  })
+    .then(size => {
+      res.status(200).json({ size });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
 api.post('/', authenticate, (req, res) => {
   const { displayName, productID, height, width } = req.body;
   const size = new Size({ displayName, productID, height, width });
