@@ -92,7 +92,7 @@ api.post('/', authenticate, (req, res) => {
 
 api.get('/parts', authenticate, (req, res) => {
   const { orderID } = req.query;
-  Order.findOne({
+  OrderPart.findAll({
     where: {
       isDeleted: false,
       orderID,
@@ -112,8 +112,8 @@ api.get('/parts', authenticate, (req, res) => {
       'updatedAt',
     ],
   })
-    .then(order => {
-      res.status(200).json({ order });
+    .then(parts => {
+      res.status(200).json({ parts });
     })
     .catch(err => {
       res.status(400).json({ errors: err });
