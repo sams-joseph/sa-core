@@ -13,6 +13,7 @@ const products = require('./routes/products');
 const sizes = require('./routes/sizes');
 const designs = require('./routes/designs');
 const designSizes = require('./routes/design_sizes');
+const orders = require('./routes/orders');
 
 dotenv.config();
 const app = express();
@@ -25,6 +26,9 @@ app.use('/api/products', products);
 app.use('/api/sizes', sizes);
 app.use('/api/designs', designs);
 app.use('/api/design-sizes', designSizes);
+app.use('/api/orders', orders);
+
+app.use('/static', express.static('public'));
 
 app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
