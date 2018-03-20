@@ -120,6 +120,36 @@ api.get('/parts', authenticate, (req, res) => {
     });
 });
 
+api.get('/part', authenticate, (req, res) => {
+  const { id } = req.query;
+  OrderPart.findOne({
+    where: {
+      isDeleted: false,
+      id,
+    },
+    attributes: [
+      'id',
+      'orderID',
+      'productID',
+      'sizeID',
+      'designID',
+      'quantity',
+      'name',
+      'date',
+      'image',
+      'portrait',
+      'createdAt',
+      'updatedAt',
+    ],
+  })
+    .then(part => {
+      res.status(200).json({ part });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
 api.post('/part', authenticate, (req, res) => {
   const { orderID, productID, sizeID, designID, quantity, name, date, image, portrait } = req.body;
   const imageName = `${100000 + orderID}_${name}_${date}_${Date.now()}`;
