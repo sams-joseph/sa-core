@@ -2,9 +2,16 @@ const bcrypt = require('bcryptjs');
 
 const ROUNDS = 10;
 
-const generatePasswordHash = password => {
-  const salt = bcrypt.genSaltSync(ROUNDS);
-  return bcrypt.hashSync(password, salt);
-};
+const hashPassword = password =>
+  new Promise((resolve, reject) => {
+    bcrypt.genSalt(ROUNDS, (err, salt) => {
+      if (err) return reject(err);
 
-module.exports = generatePasswordHash;
+      bcrypt.hash(password, salt, (err, hash) => {
+        if (err) return reject(err);
+        return resolve(hash);
+      });
+    });
+  });
+
+module.exports = hashPassword;

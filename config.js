@@ -6,7 +6,7 @@ if (fs.existsSync('.env')) {
 }
 
 const defaults = {
-  POSTGRES_URL: 'postgres://postgres:postgres@localhost/sepsis', // connection string for PostgreSQL
+  POSTGRES_URL: 'postgres://postgres:postgres', // connection string for PostgreSQL
   BACKEND_PORT: '5000',
 };
 

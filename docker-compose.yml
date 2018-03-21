@@ -1,14 +1,15 @@
 version: '2'
 services:
   postgres:
-    build:
-      context: .
-      dockerfile: docker/postgres.dockerfile
     image: postgres
     restart: always
     volumes_from:
       - data
     container_name: sepsis-postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: database_development
   data:
     image: tianon/true
     volumes:

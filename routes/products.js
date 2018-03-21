@@ -1,12 +1,12 @@
 const express = require('express');
 
-const Product = require('../models/Product');
+const db = require('../models');
 const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
 api.get('/', authenticate, (req, res) => {
-  Product.findAll({
+  db.Product.findAll({
     where: {
       isDeleted: false,
     },
@@ -22,7 +22,7 @@ api.get('/', authenticate, (req, res) => {
 
 api.get('/product', authenticate, (req, res) => {
   const { id } = req.query;
-  Product.findOne({
+  db.Product.findOne({
     where: {
       isDeleted: false,
       id,
@@ -39,7 +39,7 @@ api.get('/product', authenticate, (req, res) => {
 
 api.post('/', authenticate, (req, res) => {
   const { name, description, imageUrl } = req.body;
-  const product = new Product({ name, description, imageUrl });
+  const product = new db.Product({ name, description, imageUrl });
   product
     .save()
     .then(productRecord => {

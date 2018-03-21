@@ -1,8 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 
-const Order = require('../models/Order');
-const OrderPart = require('../models/OrderPart');
+const db = require('../models');
 const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
@@ -15,26 +14,20 @@ function saveImage(image, imageName, cb) {
 
 api.get('/', authenticate, (req, res) => {
   const { currentUser } = req;
-  Order.findAll({
-    where: {
-      userID: currentUser.id,
-      isDeleted: false,
-    },
-    attributes: [
-      'id',
-      'userID',
-      'shippingName',
-      'shippingAddress',
-      'shippingCity',
-      'shippingState',
-      'shippingZip',
-      'isDeleted',
-      'createdAt',
-      'updatedAt',
-    ],
-  })
-    .then(orders => {
-      res.status(200).json({ orders });
+  db.User.findOne({ where: { email: currentUser.email } })
+    .then(user => {
+      user
+        .getOrders({
+          include: [
+            {
+              model: db.Part,
+              include: [db.Product, db.Size, db.Design],
+            },
+          ],
+        })
+        .then(orders => {
+          res.status(200).json({ message: `Orders for ${user.email}.`, orders });
+        });
     })
     .catch(err => {
       res.status(400).json({ errors: err });
@@ -43,22 +36,16 @@ api.get('/', authenticate, (req, res) => {
 
 api.get('/order', authenticate, (req, res) => {
   const { id } = req.query;
-  Order.findOne({
+  db.Order.findOne({
     where: {
       isDeleted: false,
       id,
     },
-    attributes: [
-      'id',
-      'userID',
-      'shippingName',
-      'shippingAddress',
-      'shippingCity',
-      'shippingState',
-      'shippingZip',
-      'isDeleted',
-      'createdAt',
-      'updatedAt',
+    include: [
+      {
+        model: db.Part,
+        include: [db.Product, db.Size, db.Design],
+      },
     ],
   })
     .then(order => {
@@ -71,46 +58,54 @@ api.get('/order', authenticate, (req, res) => {
 
 api.post('/', authenticate, (req, res) => {
   const { shippingName, shippingAddress, shippingCity, shippingState, shippingZip } = req.body;
+  const orderParts = JSON.parse(req.body.orderParts);
   const { currentUser } = req;
-  const order = new Order({
-    userID: currentUser.id,
-    shippingName,
-    shippingAddress,
-    shippingCity,
-    shippingState,
-    shippingZip,
+
+  db.User.findById(currentUser.id).then(user => {
+    user
+      .createOrder({
+        userId: currentUser.id,
+        shippingName,
+        shippingAddress,
+        shippingCity,
+        shippingState,
+        shippingZip,
+      })
+      .then(order => {
+        const promises = [];
+        orderParts.forEach(part => {
+          const imageName = `${100000 + order.id}_${part.name}_${part.date}_${Date.now()}`;
+          const portraitName = `${100000 + order.id}_${part.name}_${Date.now()}`;
+          saveImage(part.image, imageName);
+          saveImage(part.portrait, portraitName);
+
+          promises.push(
+            order.createPart({
+              productId: part.productId,
+              sizeId: part.sizeId,
+              designId: part.designId,
+              quantity: part.quantity,
+              name: part.name,
+              date: part.date,
+              image: imageName,
+              portrait: portraitName,
+            })
+          );
+        });
+        Promise.all(promises).then(result => {
+          res.status(200).json({ message: 'Order created successfully', order: result });
+        });
+      });
   });
-  order
-    .save()
-    .then(orderRecord => {
-      res.status(200).json({ message: 'Order created successfully', order: orderRecord });
-    })
-    .catch(err => {
-      res.status(400).json({ errors: err });
-    });
 });
 
 api.get('/parts', authenticate, (req, res) => {
-  const { orderID } = req.query;
-  OrderPart.findAll({
+  const { orderId } = req.query;
+  db.Part.findAll({
     where: {
       isDeleted: false,
-      orderID,
+      orderId,
     },
-    attributes: [
-      'id',
-      'orderID',
-      'productID',
-      'sizeID',
-      'designID',
-      'quantity',
-      'name',
-      'date',
-      'image',
-      'portrait',
-      'createdAt',
-      'updatedAt',
-    ],
   })
     .then(parts => {
       res.status(200).json({ parts });
@@ -122,56 +117,15 @@ api.get('/parts', authenticate, (req, res) => {
 
 api.get('/part', authenticate, (req, res) => {
   const { id } = req.query;
-  OrderPart.findOne({
+  db.Part.findOne({
     where: {
       isDeleted: false,
       id,
     },
-    attributes: [
-      'id',
-      'orderID',
-      'productID',
-      'sizeID',
-      'designID',
-      'quantity',
-      'name',
-      'date',
-      'image',
-      'portrait',
-      'createdAt',
-      'updatedAt',
-    ],
+    include: [db.Product, db.Size, db.Design],
   })
     .then(part => {
       res.status(200).json({ part });
-    })
-    .catch(err => {
-      res.status(400).json({ errors: err });
-    });
-});
-
-api.post('/part', authenticate, (req, res) => {
-  const { orderID, productID, sizeID, designID, quantity, name, date, image, portrait } = req.body;
-  const imageName = `${100000 + orderID}_${name}_${date}_${Date.now()}`;
-  const portraitName = `${100000 + orderID}_${name}_${Date.now()}`;
-  saveImage(image, imageName);
-  saveImage(portrait, portraitName);
-
-  const part = new OrderPart({
-    orderID,
-    productID,
-    sizeID,
-    designID,
-    quantity,
-    name,
-    date,
-    image: imageName,
-    portrait: portraitName,
-  });
-  part
-    .save()
-    .then(partRecord => {
-      res.status(200).json({ message: 'Part created successfully', part: partRecord });
     })
     .catch(err => {
       res.status(400).json({ errors: err });

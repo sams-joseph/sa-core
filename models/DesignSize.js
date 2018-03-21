@@ -1,35 +1,25 @@
-const Sequelize = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  const DesignSize = sequelize.define('design_sizes', {
+    imageUrl: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  });
 
-const db = require('../store/db');
-
-const DesignSize = db.define('design_sizes', {
-  designID: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
-  sizeID: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
-  imageUrl: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  isDeleted: {
-    type: Sequelize.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  },
-  createdAt: {
-    type: Sequelize.DATE,
-    allowNull: false,
-    defaultValue: Sequelize.NOW,
-  },
-  updatedAt: {
-    type: Sequelize.DATE,
-    allowNull: false,
-    defaultValue: Sequelize.NOW,
-  },
-});
-
-module.exports = DesignSize;
+  return DesignSize;
+};

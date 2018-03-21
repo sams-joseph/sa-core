@@ -1,16 +1,16 @@
 const express = require('express');
 
-const Size = require('../models/Size');
+const db = require('../models');
 const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
 api.get('/', authenticate, (req, res) => {
   const { id } = req.query;
-  Size.findAll({
+  db.Size.findAll({
     where: {
       isDeleted: false,
-      productID: id,
+      productId: id,
     },
   })
     .then(sizes => {
@@ -23,7 +23,7 @@ api.get('/', authenticate, (req, res) => {
 
 api.get('/size', authenticate, (req, res) => {
   const { id } = req.query;
-  Size.findOne({
+  db.Size.findOne({
     where: {
       isDeleted: false,
       id,
@@ -39,7 +39,7 @@ api.get('/size', authenticate, (req, res) => {
 
 api.post('/', authenticate, (req, res) => {
   const { displayName, productID, height, width } = req.body;
-  const size = new Size({ displayName, productID, height, width });
+  const size = new db.Size({ displayName, productID, height, width });
   size
     .save()
     .then(sizeRecord => {

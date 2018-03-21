@@ -1,14 +1,22 @@
 module.exports = (sequelize, DataTypes) => {
-  const Product = sequelize.define('products', {
+  const Part = sequelize.define('parts', {
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    description: {
+    date: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    imageUrl: {
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    portrait: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -29,15 +37,29 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
-  Product.associate = models => {
-    Product.hasMany(models.Size, {
+  Part.associate = models => {
+    models.Part.belongsTo(models.Order, {
       onDelete: 'CASCADE',
       foreignKey: {
         allowNull: false,
       },
     });
 
-    Product.hasMany(models.Design, {
+    models.Part.belongsTo(models.Product, {
+      onDelete: 'CASCADE',
+      foreignKey: {
+        allowNull: false,
+      },
+    });
+
+    models.Part.belongsTo(models.Size, {
+      onDelete: 'CASCADE',
+      foreignKey: {
+        allowNull: false,
+      },
+    });
+
+    models.Part.belongsTo(models.Design, {
       onDelete: 'CASCADE',
       foreignKey: {
         allowNull: false,
@@ -45,5 +67,5 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
-  return Product;
+  return Part;
 };

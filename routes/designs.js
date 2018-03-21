@@ -1,16 +1,16 @@
 const express = require('express');
 
-const Design = require('../models/Design');
+const db = require('../models');
 const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
 api.get('/', authenticate, (req, res) => {
   const { id } = req.query;
-  Design.findAll({
+  db.Design.findAll({
     where: {
       isDeleted: false,
-      productID: id,
+      productId: id,
     },
     attributes: ['id', 'name', 'description', 'imageUrl', 'createdAt', 'updatedAt'],
   })
@@ -24,7 +24,7 @@ api.get('/', authenticate, (req, res) => {
 
 api.get('/design', authenticate, (req, res) => {
   const { id } = req.query;
-  Design.findOne({
+  db.Design.findOne({
     where: {
       isDeleted: false,
       id,
@@ -41,7 +41,7 @@ api.get('/design', authenticate, (req, res) => {
 
 api.post('/', authenticate, (req, res) => {
   const { productID, name, description, imageUrl } = req.body;
-  const design = new Design({ productID, name, description, imageUrl });
+  const design = new db.Design({ productID, name, description, imageUrl });
   design
     .save()
     .then(designRecord => {

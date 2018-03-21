@@ -1,39 +1,37 @@
-const Sequelize = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  const Size = sequelize.define('sizes', {
+    displayName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    height: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    width: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  });
 
-const db = require('../store/db');
+  Size.associate = models => {
+    Size.hasMany(models.DesignSize);
+  };
 
-const Size = db.define('sizes', {
-  productID: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
-  displayName: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
-  height: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
-  width: {
-    type: Sequelize.INTEGER,
-    allowNull: false,
-  },
-  isDeleted: {
-    type: Sequelize.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  },
-  createdAt: {
-    type: Sequelize.DATE,
-    allowNull: false,
-    defaultValue: Sequelize.NOW,
-  },
-  updatedAt: {
-    type: Sequelize.DATE,
-    allowNull: false,
-    defaultValue: Sequelize.NOW,
-  },
-});
-
-module.exports = Size;
+  return Size;
+};

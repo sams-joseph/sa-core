@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const db = require('../models');
 
 const authenticate = (req, res, next) => {
   const header = req.headers.authorization;
@@ -12,7 +12,7 @@ const authenticate = (req, res, next) => {
       if (err) {
         res.status(401).json({ errors: { global: 'Invalid token' } });
       } else {
-        User.findOne({ where: { email: decoded.email } }).then(user => {
+        db.User.findOne({ where: { email: decoded.email } }).then(user => {
           req.currentUser = user;
           next();
         });

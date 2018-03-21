@@ -2,7 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const moment = require('moment');
 
-const User = require('../models/User');
+const db = require('../models');
 const sendResetPasswordEmail = require('../mail/mailer').sendResetPasswordEmail;
 
 const api = express.Router();
@@ -10,7 +10,7 @@ const api = express.Router();
 api.post('/', (req, res) => {
   const { credentials } = req.body;
 
-  User.findOne({ where: { email: credentials.email } })
+  db.User.findOne({ where: { email: credentials.email } })
     .then(user => {
       if (user && user.isValidPassword(credentials.password, user.password)) {
         res.status(200).json({
@@ -28,7 +28,7 @@ api.post('/', (req, res) => {
 
 api.post('/confirmation', (req, res) => {
   const token = req.body.token;
-  User.findOne({ where: { confirmationToken: token } })
+  db.User.findOne({ where: { confirmationToken: token } })
     .then(user => {
       if (user) {
         user
@@ -54,7 +54,7 @@ api.post('/confirmation', (req, res) => {
 });
 
 api.post('/forgot-password', (req, res) => {
-  User.findOne({ email: req.body.email }).then(user => {
+  db.User.findOne({ email: req.body.email }).then(user => {
     if (user) {
       sendResetPasswordEmail(user);
       res.json({ message: 'An email has been sent with a link to reset your password.' });
@@ -76,7 +76,7 @@ api.post('/validate-token', (req, res) => {
 
 api.post('/reset-password', (req, res) => {
   const { password, token } = req.body;
-  User.findOne({ resetPasswordToken: token }).then(user => {
+  db.User.findOne({ resetPasswordToken: token }).then(user => {
     if (user && moment(user.resetPasswordExpires).diff(moment()) > 0) {
       user.setPassword(password);
       user.resetPasswordToken = null;
@@ -91,7 +91,7 @@ api.post('/reset-password', (req, res) => {
 api.post('/confirmation', (req, res) => {
   const token = req.body.token;
 
-  User.findOne({ confirmationToken: token }).then(user => {
+  db.User.findOne({ confirmationToken: token }).then(user => {
     if (user) {
       user.confirmationToken = '';
       user.confirmed = true;
