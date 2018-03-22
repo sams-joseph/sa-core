@@ -58,7 +58,6 @@ api.get('/order', authenticate, (req, res) => {
 
 api.post('/', authenticate, (req, res) => {
   const { shippingName, shippingAddress, shippingCity, shippingState, shippingZip } = req.body;
-  const orderParts = JSON.parse(req.body.orderParts);
   const { currentUser } = req;
 
   db.User.findById(currentUser.id).then(user => {
@@ -72,29 +71,32 @@ api.post('/', authenticate, (req, res) => {
         shippingZip,
       })
       .then(order => {
-        const promises = [];
-        orderParts.forEach(part => {
-          const imageName = `${100000 + order.id}_${part.name}_${part.date}_${Date.now()}`;
-          const portraitName = `${100000 + order.id}_${part.name}_${Date.now()}`;
-          saveImage(part.image, imageName);
-          saveImage(part.portrait, portraitName);
+        res.status(200).json({ message: 'Order created successfully', order });
+      });
+  });
+});
 
-          promises.push(
-            order.createPart({
-              productId: part.productId,
-              sizeId: part.sizeId,
-              designId: part.designId,
-              quantity: part.quantity,
-              name: part.name,
-              date: part.date,
-              image: imageName,
-              portrait: portraitName,
-            })
-          );
-        });
-        Promise.all(promises).then(result => {
-          res.status(200).json({ message: 'Order created successfully', order: result });
-        });
+api.post('/part', authenticate, (req, res) => {
+  const { orderId, productId, sizeId, designId, quantity, name, date, image, portrait } = req.body;
+  const imageName = `${100000 + orderId}_${name}_${date}_${Date.now()}`;
+  const portraitName = `${100000 + orderId}_${name}_${Date.now()}`;
+  saveImage(image, imageName);
+  saveImage(portrait, portraitName);
+
+  db.Order.findById(orderId).then(order => {
+    order
+      .createPart({
+        productId,
+        sizeId,
+        designId,
+        quantity,
+        name,
+        date,
+        image: imageName,
+        portrait: portraitName,
+      })
+      .then(result => {
+        res.status(200).json({ message: 'Part created successfully', order: result });
       });
   });
 });
