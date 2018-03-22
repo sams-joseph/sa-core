@@ -59,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = models => {
     User.hasMany(models.Order);
+    User.belongsTo(models.Role);
   };
 
   User.beforeCreate(user =>

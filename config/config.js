@@ -5,6 +5,7 @@ module.exports = {
     database: 'database_development',
     host: 'postgres',
     dialect: 'postgres',
+    operatorsAliases: false,
   },
   test: {
     username: 'postgres',
@@ -12,6 +13,7 @@ module.exports = {
     database: 'database_test',
     host: 'postgres',
     dialect: 'postgres',
+    operatorsAliases: false,
   },
   production: {
     username: process.env.PGUSER,
@@ -19,5 +21,6 @@ module.exports = {
     database: process.env.PGDATABASE,
     host: process.env.PGHOST,
     dialect: 'postgres',
+    operatorsAliases: false,
   },
 };

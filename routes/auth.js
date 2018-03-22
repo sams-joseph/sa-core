@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const moment = require('moment');
 
 const db = require('../models');
+
+const Op = db.Sequelize.Op;
 const sendResetPasswordEmail = require('../mail/mailer').sendResetPasswordEmail;
 
 const api = express.Router();
@@ -10,7 +12,7 @@ const api = express.Router();
 api.post('/', (req, res) => {
   const { credentials } = req.body;
 
-  db.User.findOne({ where: { email: credentials.email } })
+  db.User.findOne({ where: { email: { [Op.eq]: credentials.email } } })
     .then(user => {
       if (user && user.isValidPassword(credentials.password, user.password)) {
         res.status(200).json({
@@ -28,7 +30,7 @@ api.post('/', (req, res) => {
 
 api.post('/confirmation', (req, res) => {
   const token = req.body.token;
-  db.User.findOne({ where: { confirmationToken: token } })
+  db.User.findOne({ where: { confirmationToken: { [Op.eq]: token } } })
     .then(user => {
       if (user) {
         user
@@ -54,7 +56,7 @@ api.post('/confirmation', (req, res) => {
 });
 
 api.post('/forgot-password', (req, res) => {
-  db.User.findOne({ email: req.body.email }).then(user => {
+  db.User.findOne({ email: { [Op.eq]: req.body.email } }).then(user => {
     if (user) {
       sendResetPasswordEmail(user);
       res.json({ message: 'An email has been sent with a link to reset your password.' });
@@ -76,7 +78,7 @@ api.post('/validate-token', (req, res) => {
 
 api.post('/reset-password', (req, res) => {
   const { password, token } = req.body;
-  db.User.findOne({ resetPasswordToken: token }).then(user => {
+  db.User.findOne({ resetPasswordToken: { [Op.eq]: token } }).then(user => {
     if (user && moment(user.resetPasswordExpires).diff(moment()) > 0) {
       user.setPassword(password);
       user.resetPasswordToken = null;
@@ -91,7 +93,7 @@ api.post('/reset-password', (req, res) => {
 api.post('/confirmation', (req, res) => {
   const token = req.body.token;
 
-  db.User.findOne({ confirmationToken: token }).then(user => {
+  db.User.findOne({ confirmationToken: { [Op.eq]: token } }).then(user => {
     if (user) {
       user.confirmationToken = '';
       user.confirmed = true;

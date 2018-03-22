@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 
 const db = require('../models');
+const sendOrderConfirmationEmail = require('../mail/mailer').sendOrderConfirmationEmail;
 const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
@@ -74,6 +75,14 @@ api.post('/', authenticate, (req, res) => {
         res.status(200).json({ message: 'Order created successfully', order });
       });
   });
+});
+
+api.post('/confirm', authenticate, (req, res) => {
+  const { order } = req.body;
+  const { currentUser } = req;
+
+  sendOrderConfirmationEmail(currentUser, order);
+  res.status(200).json({ message: 'Order placed successfully' });
 });
 
 api.post('/part', authenticate, (req, res) => {

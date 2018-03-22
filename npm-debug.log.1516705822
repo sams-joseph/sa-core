@@ -5,15 +5,15 @@
 1 verbose cli   '--json',
 1 verbose cli   '--production' ]
 2 info using npm@3.10.10
-3 info using node@v6.12.3
+3 info using node@v6.13.0
 4 verbose exit [ 0, true ]
 5 verbose stack Error: write EPIPE
 5 verbose stack     at exports._errnoException (util.js:1020:11)
-5 verbose stack     at WriteWrap.afterWrite (net.js:800:14)
+5 verbose stack     at WriteWrap.afterWrite (net.js:812:14)
 6 verbose cwd /usr/src
 7 error Linux 4.9.60-linuxkit-aufs
 8 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "ls" "--json" "--production"
-9 error node v6.12.3
+9 error node v6.13.0
 10 error npm  v3.10.10
 11 error code EPIPE
 12 error errno EPIPE

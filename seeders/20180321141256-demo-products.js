@@ -3,8 +3,8 @@ module.exports = {
     queryInterface.bulkInsert('products', [
       {
         name: 'Bulletin',
-        description: 'Description',
-        imageUrl: 'http://via.placeholder.com/350x150',
+        description: 'High impact Out Of Home product.',
+        imageUrl: 'https://js-static.nyc3.digitaloceanspaces.com/products/bulletin-product.jpg',
         isDeleted: false,
         createdAt: new Date(),
         updatedAt: new Date(),
