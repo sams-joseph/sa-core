@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const Email = require('email-templates');
 const path = require('path');
 
-const from = '"Sepsis Awareness Boards" <noreply@sepsisboards.com>';
+const from = '"MMT Online Shop" <noreply@mmtshop.com>';
 
 function setup() {
   return nodemailer.createTransport({
@@ -101,29 +101,12 @@ const sendOrderConfirmationEmail = (user, order) => {
         to: user.email,
       },
       locals: {
-        name: user.firstName,
         orderNumber: order.id + 100000,
+        order,
       },
     })
     .then(console.log)
     .catch(console.error);
 };
-
-// const sendOrderConfirmationEmail = (user, order) => {
-//   const transport = setup();
-//   const email = {
-//     from,
-//     to: user.email,
-//     subject: 'Sepsis Awareness Order Confirmation',
-//     text: `
-//     Hi ${user.firstName}
-//     Thank you for placing your order.
-
-//     ${order.id + 100000}
-//     `,
-//   };
-
-//   transport.sendMail(email);
-// };
 
 module.exports = { sendConfirmationEmail, sendResetPasswordEmail, sendOrderConfirmationEmail };
