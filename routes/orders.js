@@ -81,19 +81,30 @@ api.post('/confirm', authenticate, (req, res) => {
   const { order } = req.body;
   const { currentUser } = req;
 
-  db.Order.findOne({
-    where: {
-      isDeleted: false,
-      id: order.id,
-    },
-    include: [
-      {
-        model: db.Part,
-        include: [db.Product, db.Size, db.Design],
+  Promise.all([
+    db.Order.findOne({
+      where: {
+        isDeleted: false,
+        id: order.id,
       },
-    ],
-  }).then(orderRecord => {
-    sendOrderConfirmationEmail(currentUser, orderRecord);
+      include: [
+        {
+          model: db.Part,
+          include: [db.Product, db.Size, db.Design],
+        },
+      ],
+    }),
+    db.User.findOne({
+      where: {
+        isDeleted: false,
+        id: currentUser.id,
+      },
+      include: [db.Subscription],
+    }),
+  ]).then(results => {
+    if (results[1]) {
+      sendOrderConfirmationEmail(results[1], results[0]);
+    }
     res.status(200).json({ message: 'Order placed successfully' });
   });
 });

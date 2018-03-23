@@ -47,7 +47,7 @@ const sendConfirmationEmail = user => {
       },
       locals: {
         name: user.firstName,
-        confirmationLink: user.generateConfirmationUrl(),
+        confirmationUrl: user.generateConfirmationUrl(),
       },
     })
     .then(console.log)
