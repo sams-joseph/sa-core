@@ -1,2 +1,2 @@
-sudo docker run -d --name pgdata -v /data/db tianon/true
-sudo docker start pgdata
+docker run -d --name pgdata -v /data/db tianon/true
+docker start pgdata

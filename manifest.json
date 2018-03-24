@@ -1,16 +1,14 @@
 {
-  "apps": [
-    {
-      "script": "app.js",
-      "watch": true,
-      "ignore_watch": [
-        ".git",
-        "node_modules",
-        "public",
-      ],
-      "group": "web",
-      "exec_mode": "cluster",
-      "instances": 1
-    }
-  ]
+  "apps": [{
+    "script": "app.js",
+    "watch": true,
+    "ignore_watch": [
+      ".git",
+      "node_modules",
+      "public"
+    ],
+    "group": "web",
+    "exec_mode": "cluster",
+    "instances": 1
+  }]
 }
