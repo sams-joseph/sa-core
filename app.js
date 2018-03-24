@@ -3,7 +3,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 
-const db = require(`${__dirname}/models`);
+const db = require('./models');
 const dotenv = require('dotenv');
 const cors = require('cors');
 
