@@ -60,6 +60,7 @@ module.exports = (sequelize, DataTypes) => {
   User.associate = models => {
     User.hasMany(models.Order);
     User.belongsTo(models.Role);
+    User.belongsTo(models.Subscription);
   };
 
   User.beforeCreate(user =>

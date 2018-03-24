@@ -20,6 +20,7 @@ const db = {
   Design: sequelize.import('./design'),
   DesignSize: sequelize.import('./designSize'),
   Role: sequelize.import('./role'),
+  Subscription: sequelize.import('./subscription'),
 };
 
 Object.keys(db).forEach(modelName => {

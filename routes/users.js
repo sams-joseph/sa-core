@@ -9,9 +9,9 @@ api.post('/', (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   db.User.create({ firstName, lastName, email, password })
     .then(user => {
-      user.setRole(2).then(userRecord => {
-        sendConfirmationEmail(user);
-        res.status(200).json({ message: 'User created successfully.', user: userRecord.toAuthJSON() });
+      Promise.all([user.setRole(2), user.createSubscription()]).then(results => {
+        sendConfirmationEmail(results[0]);
+        res.status(200).json({ message: 'User created successfully.', user: results[0].toAuthJSON() });
       });
     })
     .catch(err => {
