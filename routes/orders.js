@@ -7,10 +7,10 @@ const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
-function saveImage(image, imageName, cb) {
+function saveImage(image, imageName) {
   const imageData = image.replace(/^data:image\/\w+;base64,/, '');
   const buf = new Buffer(imageData, 'base64');
-  fs.writeFileSync(`/usr/src/public/images/${imageName}.png`, buf);
+  fs.writeFileSync(`/usr/src/app/public/images/${imageName}.png`, buf);
 }
 
 api.get('/', authenticate, (req, res) => {
