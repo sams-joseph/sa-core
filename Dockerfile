@@ -11,8 +11,12 @@ RUN mkdir -p /usr/src
 
 WORKDIR /usr/src
 
+COPY package.json yarn.lock ./
+
+RUN npm install
+
 COPY . .
 
-# ENV PATH /usr/src/node_modules/.bin:$PATH
+ENV PATH /usr/src/node_modules/.bin:$PATH
 
-# CMD ["bash"]
+CMD ["bash"]
