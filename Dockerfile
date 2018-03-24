@@ -13,6 +13,6 @@ WORKDIR /usr/src
 
 COPY . .
 
-ENV PATH /usr/src/node_modules/.bin:$PATH
+# ENV PATH /usr/src/node_modules/.bin:$PATH
 
-CMD ["bash"]
+# CMD ["bash"]
