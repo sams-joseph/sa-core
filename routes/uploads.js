@@ -3,6 +3,7 @@ const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const path = require('path');
+const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
@@ -30,7 +31,7 @@ const uploadPortrait = multer({
   storage,
 }).single('portrait');
 
-api.post('/portrait', (req, res) => {
+api.post('/portrait', authenticate, (req, res) => {
   uploadPortrait(req, res, err => {
     if (err) {
       return res.status(400).json({ errors: err });
@@ -43,7 +44,7 @@ const uploadMock = multer({
   storage,
 }).single('image');
 
-api.post('/mock', (req, res) => {
+api.post('/mock', authenticate, (req, res) => {
   uploadMock(req, res, err => {
     if (err) {
       console.log(err);
