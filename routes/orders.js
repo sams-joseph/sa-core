@@ -7,12 +7,6 @@ const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
-function saveImage(image, imageName) {
-  const imageData = image.replace(/^data:image\/\w+;base64,/, '');
-  const buf = new Buffer(imageData, 'base64');
-  fs.writeFileSync(`/usr/src/app/public/images/${imageName}.png`, buf);
-}
-
 api.get('/', authenticate, (req, res) => {
   const { currentUser } = req;
   db.User.findOne({ where: { email: currentUser.email } })
@@ -110,11 +104,8 @@ api.post('/confirm', authenticate, (req, res) => {
 });
 
 api.post('/part', authenticate, (req, res) => {
+  console.log(req.body);
   const { orderId, productId, sizeId, designId, quantity, name, date, image, portrait } = req.body;
-  const imageName = `${100000 + orderId}_${name}_${date}_${Date.now()}`;
-  const portraitName = `${100000 + orderId}_${name}_${Date.now()}`;
-  saveImage(image, imageName);
-  saveImage(portrait, portraitName);
 
   db.Order.findById(orderId).then(order => {
     order
@@ -125,8 +116,8 @@ api.post('/part', authenticate, (req, res) => {
         quantity,
         name,
         date,
-        image: imageName,
-        portrait: portraitName,
+        image,
+        portrait,
       })
       .then(result => {
         res.status(200).json({ message: 'Part created successfully', order: result });

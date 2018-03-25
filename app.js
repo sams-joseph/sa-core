@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const fileUpload = require('express-fileupload');
 
 const db = require('./models');
 const dotenv = require('dotenv');
@@ -15,10 +14,10 @@ const sizes = require('./routes/sizes');
 const designs = require('./routes/designs');
 const designSizes = require('./routes/design_sizes');
 const orders = require('./routes/orders');
+const uploads = require('./routes/uploads');
 
 dotenv.config();
 const app = express();
-app.use(fileUpload({ safeFileNames: true, preserveExtension: 0 }));
 app.use(bodyParser.json());
 app.use(cors({ origin: true, credentials: true }));
 app.use('/api/auth', auth);
@@ -28,6 +27,7 @@ app.use('/api/sizes', sizes);
 app.use('/api/designs', designs);
 app.use('/api/design-sizes', designSizes);
 app.use('/api/orders', orders);
+app.use('/api/uploads', uploads);
 
 app.use('/static', express.static('public'));
 
