@@ -8,7 +8,7 @@
     "start": "node index",
     "lintnofix": "eslint . --ext .js,.jsx",
     "lint": "eslint . --ext .js, .jsx --fix",
-    "build": "npm install && npm run lintnofix"
+    "build": "npm install"
   },
   "author": "",
   "license": "ISC",
