@@ -1,4 +1,5 @@
 const express = require('express');
+const gradient = require('abcolor').gradient;
 const db = require('../models');
 
 const Op = db.Sequelize.Op;
@@ -77,11 +78,21 @@ api.get('/monthly', authenticate, (req, res) => {
             ],
           })
           .then(orders => {
-            data.push({ name: months[i], value: orders.length, fill: '#0D47A1', Qty: orders.length });
-            itemsProcessed += 1;
-            if (itemsProcessed === months.length) {
-              res.status(200).json({ message: `Orders for ${user.email}.`, monthlyData: data });
-            }
+            user.getOrders({}).then(allOrders => {
+              const totalOrders = allOrders.length;
+              const monthlyOrders = orders.length;
+              const percentOfTotal = monthlyOrders / totalOrders * 100;
+              const fillColor = gradient(percentOfTotal, {
+                css: true,
+                from: '#3373d6',
+                to: '#0D47A1',
+              });
+              data.push({ name: months[i], value: orders.length, fill: fillColor, Qty: orders.length });
+              itemsProcessed += 1;
+              if (itemsProcessed === months.length) {
+                res.status(200).json({ message: `Orders for ${user.email}.`, monthlyData: data });
+              }
+            });
           });
       });
     })
@@ -219,11 +230,28 @@ api.get('/parts/designs', authenticate, (req, res) => {
           },
         })
           .then(parts => {
-            data.push({ name: design.name, value: parts.length, fill: '#0D47A1', Qty: parts.length });
-            itemsProcessed += 1;
-            if (itemsProcessed === designs.length) {
-              res.status(200).json({ designData: data });
-            }
+            db.User.findOne({ where: { email: currentUser.email } }).then(user => {
+              user
+                .getParts({})
+                .then(allParts => {
+                  const totalOrders = allParts.length;
+                  const monthlyOrders = parts.length;
+                  const percentOfTotal = monthlyOrders / totalOrders * 100;
+                  const fillColor = gradient(percentOfTotal, {
+                    css: true,
+                    from: '#3373d6',
+                    to: '#0D47A1',
+                  });
+                  data.push({ name: design.name, value: parts.length, fill: fillColor, Qty: parts.length });
+                  itemsProcessed += 1;
+                  if (itemsProcessed === designs.length) {
+                    res.status(200).json({ designData: data });
+                  }
+                })
+                .catch(err => {
+                  res.status(400).json({ errors: err });
+                });
+            });
           })
           .catch(err => {
             res.status(400).json({ errors: err });
@@ -255,11 +283,28 @@ api.get('/parts/products', authenticate, (req, res) => {
           },
         })
           .then(parts => {
-            data.push({ name: size.displayName, value: parts.length, fill: '#0D47A1', Qty: parts.length });
-            itemsProcessed += 1;
-            if (itemsProcessed === sizes.length) {
-              res.status(200).json({ sizeData: data });
-            }
+            db.User.findOne({ where: { email: currentUser.email } }).then(user => {
+              user
+                .getParts({})
+                .then(allParts => {
+                  const totalOrders = allParts.length;
+                  const monthlyOrders = parts.length;
+                  const percentOfTotal = monthlyOrders / totalOrders * 100;
+                  const fillColor = gradient(percentOfTotal, {
+                    css: true,
+                    from: '#3373d6',
+                    to: '#0D47A1',
+                  });
+                  data.push({ name: size.displayName, value: parts.length, fill: fillColor, Qty: parts.length });
+                  itemsProcessed += 1;
+                  if (itemsProcessed === sizes.length) {
+                    res.status(200).json({ sizeData: data });
+                  }
+                })
+                .catch(err => {
+                  res.status(400).json({ errors: err });
+                });
+            });
           })
           .catch(err => {
             res.status(400).json({ errors: err });
