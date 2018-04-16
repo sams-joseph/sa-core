@@ -1,7 +1,7 @@
 const express = require('express');
-const fs = require('fs');
-
 const db = require('../models');
+
+const Op = db.Sequelize.Op;
 const sendOrderConfirmationEmail = require('../mail/mailer').sendOrderConfirmationEmail;
 const authenticate = require('../middleware/authenticate');
 
@@ -45,6 +45,45 @@ api.get('/order', authenticate, (req, res) => {
   })
     .then(order => {
       res.status(200).json({ order });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
+api.get('/monthly', authenticate, (req, res) => {
+  const { currentUser } = req;
+  const { year } = req.query;
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const data = [];
+  let itemsProcessed = 0;
+  db.User.findOne({ where: { email: currentUser.email } })
+    .then(user => {
+      months.forEach((month, i) => {
+        const from = i + 1;
+        const to = i === 11 ? 1 : i + 2;
+        user
+          .getOrders({
+            where: {
+              createdAt: {
+                [Op.between]: [new Date(`${year}-${from}`), new Date(`${year}-${to}`)],
+              },
+            },
+            include: [
+              {
+                model: db.Part,
+                include: [db.Product, db.Size, db.Design],
+              },
+            ],
+          })
+          .then(orders => {
+            data.push({ name: months[i], value: orders.length, fill: '#0D47A1', Qty: orders.length });
+            itemsProcessed += 1;
+            if (itemsProcessed === months.length) {
+              res.status(200).json({ message: `Orders for ${user.email}.`, monthlyData: data });
+            }
+          });
+      });
     })
     .catch(err => {
       res.status(400).json({ errors: err });
@@ -104,12 +143,13 @@ api.post('/confirm', authenticate, (req, res) => {
 });
 
 api.post('/part', authenticate, (req, res) => {
-  console.log(req.body);
   const { orderId, productId, sizeId, designId, quantity, name, date, image, portrait } = req.body;
+  const { currentUser } = req;
 
   db.Order.findById(orderId).then(order => {
     order
       .createPart({
+        userId: currentUser.id,
         productId,
         sizeId,
         designId,
@@ -152,6 +192,79 @@ api.get('/part', authenticate, (req, res) => {
   })
     .then(part => {
       res.status(200).json({ part });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
+api.get('/parts/designs', authenticate, (req, res) => {
+  const { currentUser } = req;
+  const data = [];
+  let itemsProcessed = 0;
+
+  db.Design.findAll({
+    where: {
+      isDeleted: false,
+    },
+    attributes: ['id', 'name', 'description', 'imageUrl', 'createdAt', 'updatedAt'],
+  })
+    .then(designs => {
+      designs.forEach(design => {
+        db.Part.findAll({
+          where: {
+            isDeleted: false,
+            designId: design.id,
+            userId: currentUser.id,
+          },
+        })
+          .then(parts => {
+            data.push({ name: design.name, value: parts.length, fill: '#0D47A1', Qty: parts.length });
+            itemsProcessed += 1;
+            if (itemsProcessed === designs.length) {
+              res.status(200).json({ designData: data });
+            }
+          })
+          .catch(err => {
+            res.status(400).json({ errors: err });
+          });
+      });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
+api.get('/parts/products', authenticate, (req, res) => {
+  const { currentUser } = req;
+  const data = [];
+  let itemsProcessed = 0;
+
+  db.Size.findAll({
+    where: {
+      isDeleted: false,
+    },
+  })
+    .then(sizes => {
+      sizes.forEach(size => {
+        db.Part.findAll({
+          where: {
+            isDeleted: false,
+            sizeId: size.id,
+            userId: currentUser.id,
+          },
+        })
+          .then(parts => {
+            data.push({ name: size.displayName, value: parts.length, fill: '#0D47A1', Qty: parts.length });
+            itemsProcessed += 1;
+            if (itemsProcessed === sizes.length) {
+              res.status(200).json({ sizeData: data });
+            }
+          })
+          .catch(err => {
+            res.status(400).json({ errors: err });
+          });
+      });
     })
     .catch(err => {
       res.status(400).json({ errors: err });
