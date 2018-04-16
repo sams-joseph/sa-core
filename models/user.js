@@ -87,7 +87,7 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   User.prototype.setConfirmationToken = function setConfirmationToken() {
-    this.confirmationToken = this.generateJWT();
+    this.confirmationToken = this.generateConfirmationToken();
   };
 
   User.prototype.generateConfirmationUrl = function generateConfirmationUrl() {
@@ -123,6 +123,10 @@ module.exports = (sequelize, DataTypes) => {
       process.env.JWT_SECRET_KEY,
       { expiresIn: '1h' }
     );
+  };
+
+  User.prototype.generateConfirmationToken = function generateConfirmationToken() {
+    return cryptoRandomString(40);
   };
 
   User.prototype.generateResetPasswordToken = function generateResetPasswordToken() {

@@ -25,7 +25,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - .:/usr/src
+      - .:/usr/src/app
     links:
       - postgres
     environment:
