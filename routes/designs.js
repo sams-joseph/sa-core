@@ -22,6 +22,21 @@ api.get('/', authenticate, (req, res) => {
     });
 });
 
+api.get('/all', authenticate, (req, res) => {
+  db.Design.findAll({
+    where: {
+      isDeleted: false,
+    },
+    attributes: ['id', 'name', 'description', 'imageUrl', 'createdAt', 'updatedAt'],
+  })
+    .then(designs => {
+      res.status(200).json({ designs });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
 api.get('/design', authenticate, (req, res) => {
   const { id } = req.query;
   db.Design.findOne({

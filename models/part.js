@@ -38,6 +38,13 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   Part.associate = models => {
+    models.Part.belongsTo(models.User, {
+      onDelete: 'CASCADE',
+      foreignKey: {
+        allowNull: false,
+      },
+    });
+
     models.Part.belongsTo(models.Order, {
       onDelete: 'CASCADE',
       foreignKey: {
