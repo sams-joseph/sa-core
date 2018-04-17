@@ -109,6 +109,8 @@ module.exports = (sequelize, DataTypes) => {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
+      csrId: this.csrId,
+      roleId: this.roleId,
     };
   };
 
@@ -119,6 +121,8 @@ module.exports = (sequelize, DataTypes) => {
         firstName: this.firstName,
         lastName: this.lastName,
         email: this.email,
+        csrId: this.csrId,
+        roleId: this.roleId,
         confirmed: this.confirmed,
       },
       process.env.JWT_SECRET_KEY,
@@ -139,6 +143,8 @@ module.exports = (sequelize, DataTypes) => {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
+      csrId: this.csrId,
+      roleId: this.roleId,
       confirmed: this.confirmed,
       token: this.generateJWT(),
     };
