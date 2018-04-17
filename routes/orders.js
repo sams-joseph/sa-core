@@ -81,7 +81,7 @@ api.get('/monthly', authenticate, (req, res) => {
             user.getOrders({}).then(allOrders => {
               const totalOrders = allOrders.length;
               const monthlyOrders = orders.length;
-              const percentOfTotal = monthlyOrders / totalOrders * 100;
+              const percentOfTotal = isNaN(monthlyOrders / totalOrders * 100) ? 0 : monthlyOrders / totalOrders * 100;
               const fillColor = gradient(percentOfTotal, {
                 css: true,
                 from: '#3373d6',
