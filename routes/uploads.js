@@ -13,6 +13,7 @@ AWS.config.update({
 });
 
 const spacesEndpoint = new AWS.Endpoint('nyc3.digitaloceanspaces.com/uploads');
+
 const s3 = new AWS.S3({
   endpoint: spacesEndpoint,
 });

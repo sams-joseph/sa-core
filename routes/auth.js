@@ -12,7 +12,7 @@ const api = express.Router();
 api.post('/', (req, res) => {
   const { credentials } = req.body;
 
-  db.User.findOne({ where: { email: { [Op.eq]: credentials.email } } })
+  db.User.findOne({ where: { email: { [Op.eq]: credentials.email }, isDeleted: false } })
     .then(user => {
       if (user && user.isValidPassword(credentials.password, user.password)) {
         res.status(200).json({

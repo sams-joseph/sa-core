@@ -1,4 +1,5 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 
 const db = require('../models');
 const sendConfirmationEmail = require('../mail/mailer').sendConfirmationEmail;
@@ -12,7 +13,31 @@ api.post('/', (req, res) => {
   const csrId = req.body.csrId ? req.body.csrId : 1;
   const { token } = req.query;
 
-  if (token === process.env.TEMP_TOKEN) {
+  const header = req.headers.authorization;
+  let jwtToken;
+  if (header) jwtToken = header.split(' ')[1];
+  if (jwtToken) {
+    jwt.verify(jwtToken, process.env.JWT_SECRET_KEY, (err, decoded) => {
+      if (err) {
+        res.status(401).json({ errors: { global: 'Invalid token' } });
+      } else {
+        db.User.findOne({ where: { email: decoded.email } }).then(currentUser => {
+          if (currentUser.roleId === 1) {
+            db.User.create({ firstName, lastName, email, password, roleId, csrId })
+              .then(user => {
+                Promise.all([user.setRole(roleId), user.createSubscription(), user.setCsr(csrId)]).then(results => {
+                  sendConfirmationEmail(results[0]);
+                  res.status(200).json({ message: 'User created successfully.', user: results[0].toAuthJSON() });
+                });
+              })
+              .catch(err => {
+                res.status(400).json({ errors: err });
+              });
+          }
+        });
+      }
+    });
+  } else if (token === process.env.TEMP_TOKEN) {
     db.User.create({ firstName, lastName, email, password, roleId, csrId })
       .then(user => {
         Promise.all([user.setRole(roleId), user.createSubscription(), user.setCsr(csrId)]).then(results => {

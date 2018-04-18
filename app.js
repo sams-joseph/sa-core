@@ -16,6 +16,7 @@ const designSizes = require('./routes/design_sizes');
 const orders = require('./routes/orders');
 const uploads = require('./routes/uploads');
 const csrs = require('./routes/csr');
+const roles = require('./routes/roles');
 
 dotenv.config();
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/design-sizes', designSizes);
 app.use('/api/orders', orders);
 app.use('/api/uploads', uploads);
 app.use('/api/csrs', csrs);
+app.use('/api/roles', roles);
 
 app.use('/static', express.static('public'));
 

@@ -52,8 +52,8 @@ api.get('/size', authenticate, (req, res) => {
 });
 
 api.post('/', authenticate, (req, res) => {
-  const { displayName, productID, height, width } = req.body;
-  const size = new db.Size({ displayName, productID, height, width });
+  const { displayName, productId, height, width } = req.body;
+  const size = new db.Size({ displayName, productId, height, width });
   size
     .save()
     .then(sizeRecord => {
