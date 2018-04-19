@@ -8,6 +8,28 @@ const authenticate = require('../middleware/authenticate');
 
 const api = express.Router();
 
+api.get('/all', authenticate, (req, res) => {
+  db.DesignSize.findAll({
+    where: {
+      isDeleted: false,
+    },
+    include: [
+      {
+        model: db.Design,
+      },
+      {
+        model: db.Size,
+      },
+    ],
+  })
+    .then(designSizes => {
+      res.status(200).json({ designSizes });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
 api.get('/', authenticate, (req, res) => {
   const { designId, sizeId } = req.query;
   db.DesignSize.findOne({

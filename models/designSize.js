@@ -21,5 +21,21 @@ module.exports = (sequelize, DataTypes) => {
     },
   });
 
+  DesignSize.associate = models => {
+    DesignSize.belongsTo(models.Design, {
+      onDelete: 'CASCADE',
+      foreignKey: {
+        allowNull: false,
+      },
+    });
+
+    DesignSize.belongsTo(models.Size, {
+      onDelete: 'CASCADE',
+      foreignKey: {
+        allowNull: false,
+      },
+    });
+  };
+
   return DesignSize;
 };

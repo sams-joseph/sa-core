@@ -225,6 +225,9 @@ api.post('/part', authenticate, (req, res) => {
       })
       .then(result => {
         res.status(200).json({ message: 'Part created successfully', order: result });
+      })
+      .catch(err => {
+        res.status(400).json({ message: 'Error creating part', err });
       });
   });
 });
@@ -287,7 +290,7 @@ api.get('/parts/designs', authenticate, (req, res) => {
             .then(results => {
               const totalOrders = results[1].length;
               const monthlyOrders = results[0].length;
-              const percentOfTotal = monthlyOrders / totalOrders * 100;
+              const percentOfTotal = isNaN(monthlyOrders / totalOrders * 100) ? 0 : monthlyOrders / totalOrders * 100;
               const fillColor = gradient(percentOfTotal, {
                 css: true,
                 from: '#3373d6',
@@ -304,8 +307,9 @@ api.get('/parts/designs', authenticate, (req, res) => {
             });
         });
       })
-      .catch(err => {
-        res.status(400).json({ errors: err });
+      .catch(error => {
+        console.log(error);
+        res.status(400).json({ errors: error });
       });
   } else {
     db.Design.findAll({
@@ -329,7 +333,9 @@ api.get('/parts/designs', authenticate, (req, res) => {
                   .then(allParts => {
                     const totalOrders = allParts.length;
                     const monthlyOrders = parts.length;
-                    const percentOfTotal = monthlyOrders / totalOrders * 100;
+                    const percentOfTotal = isNaN(monthlyOrders / totalOrders * 100)
+                      ? 0
+                      : monthlyOrders / totalOrders * 100;
                     const fillColor = gradient(percentOfTotal, {
                       css: true,
                       from: '#3373d6',
@@ -382,7 +388,7 @@ api.get('/parts/products', authenticate, (req, res) => {
             .then(results => {
               const totalOrders = results[1].length;
               const monthlyOrders = results[0].length;
-              const percentOfTotal = monthlyOrders / totalOrders * 100;
+              const percentOfTotal = isNaN(monthlyOrders / totalOrders * 100) ? 0 : monthlyOrders / totalOrders * 100;
               const fillColor = gradient(percentOfTotal, {
                 css: true,
                 from: '#3373d6',
@@ -424,7 +430,9 @@ api.get('/parts/products', authenticate, (req, res) => {
                   .then(allParts => {
                     const totalOrders = allParts.length;
                     const monthlyOrders = parts.length;
-                    const percentOfTotal = monthlyOrders / totalOrders * 100;
+                    const percentOfTotal = isNaN(monthlyOrders / totalOrders * 100)
+                      ? 0
+                      : monthlyOrders / totalOrders * 100;
                     const fillColor = gradient(percentOfTotal, {
                       css: true,
                       from: '#3373d6',
