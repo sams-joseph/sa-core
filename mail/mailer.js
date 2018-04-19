@@ -88,6 +88,7 @@ const sendResetPasswordEmail = user => {
 };
 
 const sendOrderConfirmationEmail = (user, order) => {
+  const copyRecipient = user.csr.email === 'info@mmt.com' ? 'jsams@mmt.com' : user.csr.email;
   const transport = {
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
@@ -119,6 +120,7 @@ const sendOrderConfirmationEmail = (user, order) => {
       template: 'order',
       message: {
         to: user.email,
+        cc: copyRecipient,
       },
       locals: {
         orderNumber: order.id + 100000,
