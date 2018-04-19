@@ -196,7 +196,7 @@ api.post('/confirm', authenticate, (req, res) => {
         isDeleted: false,
         id: currentUser.id,
       },
-      include: [db.Subscription],
+      include: [db.Subscription, db.Csr],
     }),
   ]).then(results => {
     if (results[1]) {
