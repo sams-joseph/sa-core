@@ -59,6 +59,8 @@ module.exports = (sequelize, DataTypes) => {
 
   User.associate = models => {
     User.hasMany(models.Order);
+    User.hasMany(models.Part);
+    User.belongsTo(models.Csr);
     User.belongsTo(models.Role);
     User.belongsTo(models.Subscription);
   };
@@ -82,6 +84,13 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+  User.prototype.setPassword = function setPassword(password) {
+    hashPassword(password).then(hashedPw => {
+      this.password = hashedPw;
+      this.save();
+    });
+  };
+
   User.prototype.isValidPassword = function isValidPassword(password, passwordHash) {
     return bcrypt.compareSync(password, passwordHash);
   };
@@ -95,11 +104,12 @@ module.exports = (sequelize, DataTypes) => {
   };
 
   User.prototype.generateResetPasswordLink = function generateResetPasswordLink() {
-    const resetPasswordToken = this.generateResetPasswordToken();
-    this.resetPasswordToken = resetPasswordToken;
+    const token = cryptoRandomString(40);
+    console.log(token);
+    this.resetPasswordToken = token;
     this.resetPasswordExpires = moment().add(1, 'hour');
     this.save();
-    return `${process.env.HOST}/reset-password/${this.generateResetPasswordToken()}`;
+    return `${process.env.HOST}/reset-password/${token}`;
   };
 
   User.prototype.setUserInfo = function setUserInfo() {
@@ -108,6 +118,8 @@ module.exports = (sequelize, DataTypes) => {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
+      csrId: this.csrId,
+      roleId: this.roleId,
     };
   };
 
@@ -118,6 +130,8 @@ module.exports = (sequelize, DataTypes) => {
         firstName: this.firstName,
         lastName: this.lastName,
         email: this.email,
+        csrId: this.csrId,
+        roleId: this.roleId,
         confirmed: this.confirmed,
       },
       process.env.JWT_SECRET_KEY,
@@ -138,6 +152,8 @@ module.exports = (sequelize, DataTypes) => {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
+      csrId: this.csrId,
+      roleId: this.roleId,
       confirmed: this.confirmed,
       token: this.generateJWT(),
     };

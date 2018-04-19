@@ -21,6 +21,20 @@ api.get('/', authenticate, (req, res) => {
     });
 });
 
+api.get('/all', authenticate, (req, res) => {
+  db.Size.findAll({
+    where: {
+      isDeleted: false,
+    },
+  })
+    .then(sizes => {
+      res.status(200).json({ sizes });
+    })
+    .catch(err => {
+      res.status(400).json({ errors: err });
+    });
+});
+
 api.get('/size', authenticate, (req, res) => {
   const { id } = req.query;
   db.Size.findOne({
@@ -38,8 +52,8 @@ api.get('/size', authenticate, (req, res) => {
 });
 
 api.post('/', authenticate, (req, res) => {
-  const { displayName, productID, height, width } = req.body;
-  const size = new db.Size({ displayName, productID, height, width });
+  const { displayName, productId, height, width } = req.body;
+  const size = new db.Size({ displayName, productId, height, width });
   size
     .save()
     .then(sizeRecord => {
