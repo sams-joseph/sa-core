@@ -24,4 +24,22 @@ api.get('/', authenticate, (req, res) => {
   }
 });
 
+api.post('/', authenticate, (req, res) => {
+  const { currentUser } = req;
+  const { name } = req.body;
+  if (currentUser.roleId === 1) {
+    db.Role.create({
+      name,
+    })
+      .then(role => {
+        res.status(200).json({ role });
+      })
+      .catch(err => {
+        res.status(400).json({ errors: err });
+      });
+  } else {
+    res.status(401).json({ errors: { message: 'Unauthorized to view' } });
+  }
+});
+
 module.exports = api;
