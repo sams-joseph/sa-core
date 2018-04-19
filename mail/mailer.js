@@ -11,6 +11,9 @@ const sendConfirmationEmail = user => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
   };
 
   const email = new Email({
@@ -50,6 +53,9 @@ const sendResetPasswordEmail = user => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
   };
 
   const email = new Email({
@@ -88,6 +94,9 @@ const sendOrderConfirmationEmail = (user, order) => {
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   };
 
