@@ -56,12 +56,16 @@ api.post('/confirmation', (req, res) => {
 });
 
 api.post('/forgot-password', (req, res) => {
-  db.User.findOne({ email: { [Op.eq]: req.body.email } }).then(user => {
+  db.User.findOne({ where: { email: req.body.credentials.email } }).then(user => {
     if (user) {
       sendResetPasswordEmail(user);
-      res.json({ message: 'An email has been sent with a link to reset your password.' });
+      res.status(200).json({
+        message: 'You will receive an email to reset your password.',
+      });
     } else {
-      res.status(400).json({ errors: { message: 'There is no user with that email.' } });
+      res.status(200).json({
+        message: 'You will receive an email to reset your password.',
+      });
     }
   });
 });
@@ -77,15 +81,16 @@ api.post('/validate-token', (req, res) => {
 });
 
 api.post('/reset-password', (req, res) => {
-  const { password, token } = req.body;
-  db.User.findOne({ resetPasswordToken: { [Op.eq]: token } }).then(user => {
+  const { password, token } = req.body.credentials;
+  console.log(password);
+  db.User.findOne({ where: { resetPasswordToken: token } }).then(user => {
     if (user && moment(user.resetPasswordExpires).diff(moment()) > 0) {
       user.setPassword(password);
       user.resetPasswordToken = null;
       user.resetPasswordExpires = null;
       user.save().then(() => res.json({ message: 'Your password has been reset successfully.' }));
     } else {
-      res.status(404).json({ errors: { message: 'User either does not exist or link has expired.' } });
+      res.status(400).json({ errors: { global: 'User does not exist or link has expired.' } });
     }
   });
 });
