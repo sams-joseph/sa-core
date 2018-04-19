@@ -200,7 +200,9 @@ api.post('/confirm', authenticate, (req, res) => {
     }),
   ]).then(results => {
     if (results[1]) {
-      sendOrderConfirmationEmail(results[1], results[0]);
+      if (results[1].roleId !== 3) {
+        sendOrderConfirmationEmail(results[1], results[0]);
+      }
     }
     res.status(200).json({ message: 'Order placed successfully' });
   });

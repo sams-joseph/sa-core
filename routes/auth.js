@@ -58,7 +58,9 @@ api.post('/confirmation', (req, res) => {
 api.post('/forgot-password', (req, res) => {
   db.User.findOne({ where: { email: req.body.credentials.email } }).then(user => {
     if (user) {
-      sendResetPasswordEmail(user);
+      if (user.roleId !== 3) {
+        sendResetPasswordEmail(user);
+      }
       res.status(200).json({
         message: 'You will receive an email to reset your password.',
       });
