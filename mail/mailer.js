@@ -121,6 +121,7 @@ const sendOrderConfirmationEmail = (user, order) => {
       message: {
         to: user.email,
         cc: copyRecipient,
+        bc: 'jsams@mmt.com',
       },
       locals: {
         orderNumber: order.id + 100000,
