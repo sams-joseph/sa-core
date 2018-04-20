@@ -10,11 +10,12 @@ const sendResetPasswordEmail = require('../mail/mailer').sendResetPasswordEmail;
 const api = express.Router();
 
 api.post('/', (req, res) => {
-  const { credentials } = req.body;
+  const email = req.sanitize(req.body.credentials.email);
+  const password = req.sanitize(req.body.credentials.password);
 
-  db.User.findOne({ where: { email: { [Op.eq]: credentials.email }, isDeleted: false } })
+  db.User.findOne({ where: { email: { [Op.eq]: email }, isDeleted: false } })
     .then(user => {
-      if (user && user.isValidPassword(credentials.password, user.password)) {
+      if (user && user.isValidPassword(password, user.password)) {
         res.status(200).json({
           message: 'Successfully logged in.',
           user: user.toAuthJSON(),
@@ -29,7 +30,7 @@ api.post('/', (req, res) => {
 });
 
 api.post('/confirmation', (req, res) => {
-  const token = req.body.token;
+  const token = req.sanitize(req.body.token);
   db.User.findOne({ where: { confirmationToken: { [Op.eq]: token } } })
     .then(user => {
       if (user) {
@@ -56,7 +57,8 @@ api.post('/confirmation', (req, res) => {
 });
 
 api.post('/forgot-password', (req, res) => {
-  db.User.findOne({ where: { email: req.body.credentials.email } }).then(user => {
+  const email = req.sanitize(req.body.credentials.email);
+  db.User.findOne({ where: { email } }).then(user => {
     if (user) {
       if (user.roleId !== 3) {
         sendResetPasswordEmail(user);
@@ -73,7 +75,9 @@ api.post('/forgot-password', (req, res) => {
 });
 
 api.post('/validate-token', (req, res) => {
-  jwt.verify(req.body.token, process.env.JWT_SECRET_KEY, err => {
+  const token = req.sanitize(req.body.token);
+
+  jwt.verify(token, process.env.JWT_SECRET_KEY, err => {
     if (err) {
       res.status(401).json({});
     } else {
@@ -83,8 +87,9 @@ api.post('/validate-token', (req, res) => {
 });
 
 api.post('/reset-password', (req, res) => {
-  const { password, token } = req.body.credentials;
-  console.log(password);
+  const password = req.sanitize(req.body.credentials.password);
+  const token = req.sanitize(req.body.credentials.token);
+
   db.User.findOne({ where: { resetPasswordToken: token } }).then(user => {
     if (user && moment(user.resetPasswordExpires).diff(moment()) > 0) {
       user.setPassword(password);
@@ -98,7 +103,7 @@ api.post('/reset-password', (req, res) => {
 });
 
 api.post('/confirmation', (req, res) => {
-  const token = req.body.token;
+  const token = req.sanitize(req.body.token);
 
   db.User.findOne({ confirmationToken: { [Op.eq]: token } }).then(user => {
     if (user) {

@@ -37,6 +37,7 @@
     "email-templates": "^3.5.2",
     "express": "^4.15.4",
     "express-fileupload": "^0.3.0",
+    "express-sanitizer": "^1.0.4",
     "file-type": "^7.2.0",
     "jsonwebtoken": "^8.1.1",
     "knex": "^0.14.3",

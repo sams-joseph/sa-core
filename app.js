@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const expressSanitizer = require('express-sanitizer');
 
 const db = require('./models');
 const dotenv = require('dotenv');
@@ -21,6 +22,7 @@ const roles = require('./routes/roles');
 dotenv.config();
 const app = express();
 app.use(bodyParser.json());
+app.use(expressSanitizer());
 app.use(cors({ origin: true, credentials: true }));
 app.use('/api/auth', auth);
 app.use('/api/users', users);

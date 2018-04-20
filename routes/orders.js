@@ -48,7 +48,7 @@ api.get('/', authenticate, (req, res) => {
 });
 
 api.get('/order', authenticate, (req, res) => {
-  const { id } = req.query;
+  const id = req.sanitize(req.query.id);
   db.Order.findOne({
     where: {
       isDeleted: false,
@@ -71,7 +71,7 @@ api.get('/order', authenticate, (req, res) => {
 
 api.get('/monthly', authenticate, (req, res) => {
   const { currentUser } = req;
-  const { year } = req.query;
+  const year = req.sanitize(req.query.year);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const data = [];
   let itemsProcessed = 0;
@@ -155,7 +155,11 @@ api.get('/monthly', authenticate, (req, res) => {
 });
 
 api.post('/', authenticate, (req, res) => {
-  const { shippingName, shippingAddress, shippingCity, shippingState, shippingZip } = req.body;
+  const shippingName = req.sanitize(req.body.shippingName);
+  const shippingAddress = req.sanitize(req.body.shippingAddress);
+  const shippingCity = req.sanitize(req.body.shippingCity);
+  const shippingState = req.sanitize(req.body.shippingState);
+  const shippingZip = req.sanitize(req.body.shippingZip);
   const { currentUser } = req;
 
   db.User.findById(currentUser.id).then(user => {
@@ -209,7 +213,15 @@ api.post('/confirm', authenticate, (req, res) => {
 });
 
 api.post('/part', authenticate, (req, res) => {
-  const { orderId, productId, sizeId, designId, quantity, name, date, image, portrait } = req.body;
+  const orderId = req.sanitize(req.body.orderId);
+  const productId = req.sanitize(req.body.productId);
+  const sizeId = req.sanitize(req.body.sizeId);
+  const designId = req.sanitize(req.body.designId);
+  const quantity = req.sanitize(req.body.quantity);
+  const name = req.sanitize(req.body.name);
+  const date = req.sanitize(req.body.date);
+  const image = req.sanitize(req.body.image);
+  const portrait = req.sanitize(req.body.portrait);
   const { currentUser } = req;
 
   db.Order.findById(orderId).then(order => {
@@ -235,7 +247,7 @@ api.post('/part', authenticate, (req, res) => {
 });
 
 api.get('/parts', authenticate, (req, res) => {
-  const { orderId } = req.query;
+  const orderId = req.sanitize(req.query.orderId);
   db.Part.findAll({
     where: {
       isDeleted: false,
@@ -251,7 +263,7 @@ api.get('/parts', authenticate, (req, res) => {
 });
 
 api.get('/part', authenticate, (req, res) => {
-  const { id } = req.query;
+  const id = req.sanitize(req.query.id);
   db.Part.findOne({
     where: {
       isDeleted: false,
