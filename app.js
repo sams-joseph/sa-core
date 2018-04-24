@@ -18,6 +18,7 @@ const orders = require('./routes/orders');
 const uploads = require('./routes/uploads');
 const csrs = require('./routes/csr');
 const roles = require('./routes/roles');
+const search = require('./routes/search');
 
 dotenv.config();
 const app = express();
@@ -34,6 +35,7 @@ app.use('/api/orders', orders);
 app.use('/api/uploads', uploads);
 app.use('/api/csrs', csrs);
 app.use('/api/roles', roles);
+app.use('/api/search', search);
 
 app.use('/static', express.static('public'));
 
