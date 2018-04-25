@@ -9,6 +9,8 @@ const api = express.Router();
 api.get('/', authenticate, (req, res) => {
   const { currentUser } = req;
   const query = req.sanitize(req.query.query);
+  const limit = req.sanitize(req.query.limit);
+  const offset = req.sanitize(req.query.offset);
   db.User.findOne({ where: { email: currentUser.email } })
     .then(user => {
       user
@@ -29,7 +31,8 @@ api.get('/', authenticate, (req, res) => {
               include: [db.Product, db.Size, db.Design],
             },
           ],
-          limit: 5,
+          limit,
+          offset,
         })
         .then(orders => {
           res.status(200).json({ message: `Orders for ${user.email}.`, orders });
